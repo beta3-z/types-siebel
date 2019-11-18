@@ -1,0 +1,23 @@
+{
+  "name": "types-siebel",
+  "version": "0.0.1",
+  "description": "Siebel Browser Environment TypeScript Defenition",
+  "main": "types-siebel.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beta3-z/types-siebel.git"
+  },
+  "keywords": [
+    "siebel",
+    "types"
+  ],
+  "author": "Maksim Emelianchenko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beta3-z/types-siebel/issues"
+  },
+  "homepage": "https://github.com/beta3-z/types-siebel#readme"
+}
