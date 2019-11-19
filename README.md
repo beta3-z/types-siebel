@@ -1,0 +1,1 @@
+Types definition of Oracle Siebel browser environment
