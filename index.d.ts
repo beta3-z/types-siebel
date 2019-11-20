@@ -1,4 +1,4 @@
-declare function theApplication(): ApplicationShadow
+declare function theApplication(): Shadow.Application
 declare function IsOpenUI(): boolean
 declare function IsOfflineModeEnabled(): boolean
 declare function SWEGotoView(viewName: string): void
@@ -40,6 +40,60 @@ declare var SiebelAppFacade: {
 }
 
 declare namespace SiebelApp {
+    namespace S_App {
+        interface View {
+            GetApplet(name: string): Applet
+            GetActiveApplet(): Applet
+            GetAppletArray(): Applet[]
+            GetAppletMap(): Applet[]
+            GetBusObj(): BusObj
+            GetName(): string
+            GetTitle(): string
+            IsAppletActive(applet: Applet): boolean
+            RemoveApplet(applet: Applet): boolean
+            SetActiveApplet(applet: Applet): boolean
+            SetActiveAppletByName(name: string): boolean
+        }
+
+        interface Applet {
+            GetControls(): AppletControl[]
+            GetName(): string
+
+        }
+
+        interface AppletControl {
+
+        }
+
+        interface ListApplet extends Applet {
+
+        }
+
+        interface BusObj {
+            GetBusComp(name: string): BusComp
+            GetView(): View
+        }
+
+        interface BusComp {
+            CanDelete(): boolean
+            CanInsert(): boolean
+            CanUpdate(): boolean
+            CanMergeRecords(): boolean
+            InvokeMethod(name: string, inputs?: PropertySet): any
+            DeleteRecord(): any
+            CopyRecord() : any
+            GetFieldValue(name: string): string
+            GetFieldSearchSpec(name: string): string
+            NewRecord(): any
+            NextRecord(): any
+            RedoRecord(): any
+            UndoRecord(): any
+            SetFieldValue(name: string, value: string): boolean
+            SetFieldSearchSpec(name: string, searchSpec: string): boolean
+            WriteRecord(): any
+        }
+    }
+
     interface Utils {
         Trim(str: string): string
         LTrim(str: string): string
@@ -99,6 +153,28 @@ declare namespace SiebelAppFacade {
         UpdateModel(e): any
     }
 
+    interface ListPresentationModel extends  PresentationModel {
+
+    }
+
+    interface ViewPM extends PresentationModel {}
+
+    interface BasePR {
+        AttachPMBinding(e,t,n): void
+        BindData(): void
+        BindEvents(): void
+        CacheState(e,t): void
+        EndLife(): void
+        Init(): void
+        ShowUI(): void
+    }
+
+    interface BasePhysicalRenderer extends BasePR {}
+
+    interface ViewPR extends BasePR {
+        InvokeControlMethod(name: string): void
+    }
+
     interface Component {
         EndLife(): any
         ExecuteMethod(): any
@@ -122,31 +198,65 @@ declare namespace SiebelJS {
 
 interface Application {
     readonly uiStatus: SiebelApp.UIStatus
-    readonly shadow: ApplicationShadow
+    readonly shadow: Shadow.Application
+
+    GetActiveBusObject(): SiebelApp.S_App.BusObj
+    GetName(): string
     GetProfileAttr(name: String): String | null
     GetService(name: string): SiebelApp.Service
     NewPropertySet(): PropertySet
+    GetActiveView(): SiebelApp.S_App.View
+    GetMainView(): SiebelApp.S_App.View
+    GotoView(view: string, viewId: string, url: string, target: string): void
+
+    /**
+     * @desc calls the Siebel Server, and then returns the Login page to the client.
+     *
+     */
+    LogOff(): void
+
+    /**
+     * @param name identifies the name of the method that InvokeMethod calls.
+     * @param ps is an object that contains a property set that InvokeMethod sends as input to the method that it calls, if
+     required.
+     * @param ajaxInformation is an object that contains information about how to run AJAX.
+     *
+     */
+    InvokeMethod(name: string, ps: string, ajaxInformation: object): any
 }
 
-interface ApplicationShadow {
-    ActiveApplet(): any
-    ActiveBusComp(): any
-    ActiveBusObject(): any
-    ActiveViewName(): any
-    FindApplet(name): any
-    FindBusObject(name): any
-    GetProfileAttr(name): any
-    GetSRN(): any
-    GetService(name): any
-    InvokeMethod(name, inputPropSet): any
-    IsReady(): any
-    Name(): any
-    NewPropertySet(): any
-    SWEAlert(text): any
-    SeblTrace(category, trcMessage): any
-    SetProfileAttr(name, value): any
-    ShowModalDialog(url, argin, options): any
-    TriggerUPTEvent(inputPropSet): any
+declare namespace Shadow {
+    interface Application {
+        ActiveApplet(): Shadow.Applet
+        ActiveBusComp(): any
+        ActiveBusObject(): any
+        ActiveViewName(): any
+        FindApplet(name): any
+        FindBusObject(name): any
+        GetProfileAttr(name): any
+        GetSRN(): any
+        GetService(name): any
+        InvokeMethod(name, inputPropSet): any
+        IsReady(): any
+        Name(): any
+        NewPropertySet(): any
+        SWEAlert(text): any
+        SeblTrace(category, trcMessage): any
+        SetProfileAttr(name, value): any
+        ShowModalDialog(url, argin, options): any
+        TriggerUPTEvent(inputPropSet): any
+    }
+
+    interface Applet {
+        ActiveMode(): any
+        BusComp(): any
+        BusObject(): any
+        FindActiveXControl(controlName): any
+        FindControl(controlName): any
+        InvokeMethod(name, inputPropSet): any
+        Name(): any
+        ReInit(): any
+    }
 }
 
 interface PropertySet {
@@ -186,11 +296,12 @@ interface PropertySet {
 }
 
 interface ServiceConfig {
-    async: boolean
-    scope: any
-    selfbusy: boolean
-    mask: boolean
-    npr: boolean
-    cb(methodName: string, inputs?: PropertySet, asyncOrConfig?: boolean | ServiceConfig): void
+    /** @desc has no effect because of linear execution order of Object Manager */
+    async?: boolean
+    scope?: any
+    selfbusy?: boolean
+    mask?: boolean
+    npr?: boolean
+    cb?(methodName: string, inputs?: PropertySet, asyncOrConfig?: boolean | ServiceConfig): void
 }
 

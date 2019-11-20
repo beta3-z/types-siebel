@@ -1,7 +1,7 @@
 {
   "name": "types-siebel",
-  "version": "0.0.2",
-  "description": "Siebel Browser Environment TypeScript Defenition",
+  "version": "0.1.0",
+  "description": "Types definition of Oracle Siebel browser environment",
   "main": "",
   "scripts": {},
   "repository": {
@@ -10,7 +10,8 @@
   },
   "keywords": [
     "siebel",
-    "types"
+    "types",
+    "openui"
   ],
   "author": "Maksim Emelianchenko",
   "license": "ISC",
