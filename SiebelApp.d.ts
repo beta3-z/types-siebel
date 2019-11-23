@@ -1,4 +1,5 @@
 import {PresentationModel} from './SiebelAppFacade';
+import {JSSPropertySet} from './index'
 
 export as namespace SiebelApp
 
@@ -34,7 +35,7 @@ export class UIStatus {
 }
 
 export class Service {
-    InvokeMethod(name: string, inputs?: PropertySet, asyncOrConfig?: boolean | AjaxConfig): PropertySet
+    InvokeMethod(name: string, inputs?: JSSPropertySet, asyncOrConfig?: boolean | AjaxConfig): JSSPropertySet
     CanInvokeMethod(name: string): boolean
 }
 
@@ -48,14 +49,59 @@ export class PopupPModel extends PresentationModel {
 export namespace S_App {
     export var uiStatus: UIStatus
 
+    /**
+     * @returns {BusObj} the instance of currently active Business Object
+     */
     export function GetActiveBusObject(): BusObj
     export function GetName(): string
     export function GetProfileAttr(name: String): String | null
     export function GetService(name: string): Service
-    export function NewPropertySet(): PropertySet
+    export function NewPropertySet(): JSSPropertySet
+
+    /**
+     * @returns {View} the instance of currently active View
+     */
     export function GetActiveView(): View
+    /**
+     * @returns {View} the instance of currently active View
+     */
     export function GetMainView(): View
     export function GotoView(view: string, viewId: string, url: string, target: string): void
+
+    /**
+     * The GenerateSrvrReq method creates a request string that Siebel Open UI sends to the Siebel Server according to the
+     * current context of the application. It returns a string that includes a description of the full request.
+     *
+     * @param {string} command is a string that identifies the name of the command that Siebel Open UI must request
+     *
+     * @returns a string that contains the following information http(s)://server_name.example.com/siebel/app/callcenter/enu?SWECmd=command&SWEKeepContext=1&SWERPC=1&SRN=L8ct6oeEsPA3Cj7pF6spebyCLm2mVGpB0D0tqGMcflcb&SWEC=18&SWEActiveApplet=Client Active Applet&SWEActiveView=Client
+     *
+     */
+    export function GenerateSrvRequest(command: string): string
+
+    /**
+     * The ClearMainView method removes values for the following items:
+     *   • The view
+     *   • All child objects of the view, such as applets and controls
+     *   • The business object that the view references
+     *   • Child objects of the business object that the view references, such as business components and business
+     *     component fields
+     *
+     * ClearMainView only removes values for objects that reside in the client. It does not visually destroy these objects.
+     * If the user attempts to use an object that ClearMainView has cleared, then Siebel Open UI might not work as expected.
+     *
+     */
+    export function CleanMainView(): void
+
+    /**
+     * The CanInvokeMethod method that Siebel Open UI uses for application models determines whether or not Siebel Open UI
+     * can invoke a method. It uses the same syntax as the CanInvokeMethod method that Siebel Open UI uses for presentation
+     * models.
+     *
+     * @param methodName
+     *
+     */
+    export function CanInvokeMethod(methodName: string): boolean
 
     /**
      * @desc calls the Siebel Server, and then returns the Login page to the client.
@@ -70,7 +116,7 @@ export namespace S_App {
      * @param ajaxInformation is an object that contains information about how to run AJAX.
      *
      */
-    export function InvokeMethod(name: string, ps: string, ajaxInformation: object): any
+    export function InvokeMethod(name: string, ps: string, ajaxInformation: AjaxConfig): any
 
     export class View {
         GetApplet(name: string): Applet
@@ -102,22 +148,23 @@ export namespace S_App {
     }
 
     export class BusComp {
-        CanDelete(): boolean
-        CanInsert(): boolean
-        CanUpdate(): boolean
-        CanMergeRecords(): boolean
-        InvokeMethod(name: string, inputs?: PropertySet): any
-        DeleteRecord(): any
+        CanDelete(): boolean | undefined
+        CanInsert(e?: any): boolean | undefined
+        CanUpdate(e?: any): boolean | undefined
+        CanMergeRecords(): boolean | undefined
+        InvokeMethod(name: string, inputs?: JSSPropertySet): 'Y' | 'N'
+        DeleteRecord(): boolean
         CopyRecord() : any
         GetFieldValue(name: string): string
         GetFieldSearchSpec(name: string): string
-        NewRecord(): any
-        NextRecord(): any
-        RedoRecord(): any
-        UndoRecord(): any
+        GetFieldMap(): any
+        NewRecord(): boolean
+        NextRecord(): boolean
+        RedoRecord(): boolean
+        UndoRecord(): boolean
         SetFieldValue(name: string, value: string): boolean
         SetFieldSearchSpec(name: string, searchSpec: string): boolean
-        WriteRecord(): any
+        WriteRecord(): boolean
     }
 }
 
@@ -128,41 +175,6 @@ interface AjaxConfig {
     selfbusy?: boolean
     mask?: boolean
     npr?: boolean
-    cb?(methodName: string, inputs?: PropertySet, asyncOrConfig?: boolean | AjaxConfig): void
+    cb?(methodName: string, inputs?: JSSPropertySet, asyncOrConfig?: boolean | AjaxConfig): void
 }
 
-interface PropertySet {
-    // Serialization related
-    // Decode functions works with side effect
-    DecodeFromString(serializedPropertySet: string): boolean
-    DecodeFromStringOld(oldFashionSerializedPropertySet: string): boolean
-    EncodeAsString(): string
-    EncodeAsStringOld(): string
-
-    // Hierarchy handling
-    GetChild(index: number): PropertySet
-    GetChildByType(type: string, isChildren?: boolean): PropertySet | null
-    GetChildCount(): number
-    RemoveChild(index: number): boolean
-
-    // Properties Related
-    GetFirstProperty(): string | null
-    GetNextProperty(): string | null
-    GetProperty(name: string): string
-    SetProperty(name: string, value: string): boolean
-    RemoveProperty(name: string): void
-    GetPropertyCount(): number
-
-    // Typ
-    GetType(): string
-    SetType(type: string): boolean
-
-    // Value
-    GetValue(): string
-    SetValue(value: string): boolean
-
-    // Misc
-    Clone(): PropertySet
-    IsEmpty(): boolean
-    Reset(): void
-}
