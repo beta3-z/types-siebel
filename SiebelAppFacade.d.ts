@@ -1,3 +1,5 @@
+import {JSSPropertySet} from "./index";
+
 export as namespace SiebelAppFacade
 
 export var ComponentMgr: {
@@ -41,28 +43,61 @@ export class BasePM {
      */
     AddValidator(eventName: string, validationFunction: (...args: any[]) => boolean): boolean
 
+    AttachEventHandler(eventName: string, handler: (...args: any[]) => void): boolean
+    AttachNotificationHandler(notificationName: string, handler: (...args: any[]) => void): boolean
+
     /**
-     * Attaches an event handler to an even
+     * Binds a method to an existing method. Siebel Open UI calls the method that it binds when it finishes processing this existing method.
      */
-    AttachEventHandler(eventName: string, handler: (...args: any[]) => boolean): boolean
-    AttachNotificationHandler(t,n,r): any
-    AttachPMBinding(t,n,r): any
+    AttachPMBinding(methodName: string, handler: (...args: any[]) => void): boolean
     AttachPSHandler(t,n,r): any
-    AttachPostProxyExecuteBinding(t,n,r): any
-    AttachPreProxyExecuteBinding(t,n,r): any
-    DecorateEventHandlers(): any
-    EndLife(): any
-    ExecuteMethod(e): any
+
+    /**
+     * Binds a method that resides in a proxy or presentation model to a PostExecute method.
+     * Siebel Open UI finishes the PostExecute method, and then calls the method that AttachPostProxyExecuteBinding identifies.
+     */
+    AttachPostProxyExecuteBinding(methodName: string, handler: (...args: any[]) => void): boolean
+
+    /**
+     * Binds a method that resides in a proxy or presentation model to a PostExecute method.
+     * Siebel Open UI calls this method, and then runs PostExecute.
+     */
+    AttachPreProxyExecuteBinding(methodName: string, handler: (...args: any[]) => void): boolean
+    EndLife(): void
+
+    /**
+     * Runs a method. You can use it to run a predefined or custom method that the presentation model contains.
+     * It makes sure Siebel Open UI runs all dependency chains for the method that it calls.
+     *
+     * @param methodName - method which was added using AddMethod function
+     * @param args - any arguments which'll be send to method handler
+     */
+    ExecuteMethod(methodName: string, ...args: any[]): any
+
+    /**
+     * Returns the value of the property that Siebel Open UI adds through the AddProperty method.
+     *
+     * @param name - added property name
+     */
     Get(name: string): any
-    HandleNotify(e): any
-    HandlePostExecute(e,t,n): any
-    HandlePreExecute(e,t,n): any
-    HandleResponsePS(e): any
-    Init(): any
-    OnControlEvent(e): any
-    SetProperty(t,n,r): any
-    Setup(n): any
-    Show(): any
+
+    /**
+     *
+     * @param controlName
+     * @param displayName - the label that Siebel Open UI displays in the client for this control.
+     * @param controlType - the type of SWE control, such as SWE_CTRL_TEXTAREA
+     * @param controlIndex - specifies the physical location in the list control.
+     */
+    GetCtrlTemplate(controlName: string, displayName: string, controlType: string, controlIndex: number): any
+    Init(): void
+
+    /**
+     * Call an event
+     */
+    OnControlEvent(eventName: string, ...args: any[]): any
+    SetProperty(name: string, value: any): boolean
+    Setup(propertySet: JSSPropertySet): void
+    Show(): void
 }
 
 /**
