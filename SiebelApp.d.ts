@@ -1,4 +1,4 @@
-import {PresentationModel} from './SiebelAppFacade';
+import {BasePM, PresentationModel} from './SiebelAppFacade';
 import {JSSPropertySet} from './index'
 
 export as namespace SiebelApp
@@ -133,12 +133,39 @@ export namespace S_App {
     }
 
     export class Applet {
+        GetControl(name: string): AppletControl | undefined
         GetControls(): AppletControl[]
         GetName(): string
 
+        /**
+         * Returns the current set of records that Siebel Open UI displays in the current applet
+         */
+        GetRecordSet(): object[]
+
+        /**
+         * Returns the index of the active row of the current record set
+         */
+        GetSelection(): number
+        GetBusComp(): BusComp
+        GetActiveControl(): AppletControl
+        GetView(): View
+        GetPModel(): BasePM
+        SetActiveControl(control: AppletControl): void
     }
 
-    export class AppletControl {}
+    export class AppletControl {
+        /**
+         * @returns {string} - a string that includes the name of the field where a control is configured.
+         */
+        GetFieldName(): string
+
+        /**
+         * Returns the index of a control. This index identifies the control position in the applet.
+         */
+        GetIndex(): number
+        GetName(): string
+        GetUIType(): string
+    }
 
     export class ListApplet extends Applet {}
 
@@ -165,6 +192,10 @@ export namespace S_App {
         SetFieldValue(name: string, value: string): boolean
         SetFieldSearchSpec(name: string, searchSpec: string): boolean
         WriteRecord(): boolean
+    }
+
+    export class PluginBuilder {
+        GetUIWrapper()
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "types-siebel",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Types definition of Oracle Siebel browser environment",
   "main": "",
   "scripts": {},
@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/beta3-z/types-siebel/issues"
   },
-  "homepage": "https://github.com/beta3-z/types-siebel#readme"
+  "homepage": "https://github.com/beta3-z/types-siebel#readme",
+  "devDependencies": {
+    "@types/jquery": "^3.3.31"
+  }
 }

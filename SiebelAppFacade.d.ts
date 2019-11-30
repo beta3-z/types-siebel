@@ -1,4 +1,6 @@
 import {JSSPropertySet} from "./index";
+import {S_App} from "./SiebelApp";
+import AppletControl = S_App.AppletControl;
 
 export as namespace SiebelAppFacade
 
@@ -122,16 +124,54 @@ export class ListPresentationModel extends  PresentationModel {}
 export class ViewPM extends PresentationModel {}
 
 export class BasePR {
-    AttachPMBinding(e,t,n): void
-    BindData(): void
-    BindEvents(): void
-    CacheState(e,t): void
+    constructor(presentationModel: BasePM)
+
+    AttachPMBinding(methodName: string, handler: (...args: any[]) => void): boolean
+    /**
+     * Downloads metadata and data from the Siebel Server to the client proxy, and then binds this data to the user interface.
+     */
+    BindData(...args: any[]): void
+    BindEvents(controls: AppletControl[]): void
     EndLife(): void
     Init(): void
     ShowUI(): void
+    GetPM(): BasePM
 }
 
+/**
+ * Same as BasePR
+ */
 export class BasePhysicalRenderer extends BasePR {}
+
+export class PhysicalRenderer extends BasePR {
+    BindControlEvents(n): any
+    ControlHtmlFormatter(t,n,r,i,s,o): any
+    EnableControl(control: AppletControl): void
+    FocusFirstControl(): any
+    FocusFirstNonEditableControl(): any
+    FormatDDInQueryMode(e,t): any
+    GetPhysicalControlValue(e): any
+    HandleKeyEvents(e,n,r): any
+    IconMapFormatter(t,n,r): any
+    InjectAppletAutomationInfo(e): any
+    InjectAutomationAttr(e,t): any
+    InjectConfigInfo(e,t,n): any
+    InvokeControlMethod(e): any
+    IsValidClick(t): any
+    MaskLeaveField(e,t): any
+    RefreshControl(e): any
+    ResetRendererState(): any
+    SetControlValue(control: AppletControl, value: any): void
+    SetFocusToControl(n,r): any
+    ShowCollapseExpand(): any
+    ShowPopup(e): any
+    ShowSelection(e,n): any
+    ShowUIControl(t): any
+    UpdatePick(): any
+    UpdateUIButtons(e): any
+    UpdateUIControls(t,n): any
+    onBlurCurrency(e,t): any
+}
 
 export class ViewPR extends BasePR {
     InvokeControlMethod(name: string): void
@@ -150,3 +190,43 @@ export class Component {
     Show(): any
     SwitchPMnPR(t,n): any
 }
+
+export class BasePW {
+    constructor(control: AppletControl)
+    Init(): void
+    GetEl(): void
+    ShowUI(): void
+    BindEvents(): void
+    BindData(): void
+    SetValue(...args: any[]): void
+    GetValue(): void
+    BeginQuery(): void
+    EndQuery(): void
+    OpenPopup(): void
+    ClosePopup(): void
+    GetIconMap(e): void
+    GetTextHtml(e): void
+    HandleKey(e): void
+    SetState(...args: any[]): void
+    EndLife(): void
+}
+
+export class FieldPW extends BasePW {
+    BindData(): any
+    GetEl(): JQuery
+    GetIconMap(): any
+    GetValue(): any
+    /**
+     *
+     * @param state
+     * @param flag - indicates if the state should be reversed,
+     * @param index
+     */
+    SetState(state: 'editable' | 'enable' | 'show' | 'focus', flag: boolean, index: number): void
+
+    /**
+     * sets the value in the DOM instance of control
+     */
+    SetValue(value: any, index: number): any
+}
+
